@@ -5,7 +5,7 @@ from rest_framework import routers
 from .views import CustomViewSet,IngredientViewSet, RecipeViewSet, TagViewSet
 
 
-app_name = 'api'
+app_name = "api"
 
 router = routers.DefaultRouter()
 router.register("users", CustomViewSet)
