@@ -5,7 +5,7 @@
 
 Тестовый пользователь: 
 - login: test_user@test.ru
-- password: test777
+- password: test7777
 
 Возможности сервиса:
 
