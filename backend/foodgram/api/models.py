@@ -55,7 +55,7 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, 
                                verbose_name="Автор публикации")
-    title = models.CharField(max_length=100, verbose_name="Название")
+    name = models.CharField(max_length=100, verbose_name="Название")
     image = models.ImageField(upload_to="media/recipes/",
                               blank=True, null=True,
                               verbose_name="Картинка")
@@ -78,7 +78,7 @@ class Recipe(models.Model):
         verbose_name_plural = "Рецепты"
     
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.name}"
 
 
 class TagRecipe(models.Model):

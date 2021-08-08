@@ -4,11 +4,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-3oa_y(8f0e7m)q+nn%9$w4jgmul@p-%%c-l(i8wj3&memezr34"
+SECRET_KEY = os.environ.get('SECRET_KEY', 'GET-FROM-ENV-ON-PRODUCTION')
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'backend',]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -55,9 +55,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "foodgram.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 
@@ -114,8 +118,8 @@ DJOSER = {
 
 AUTH_USER_MODEL="api.CustomUser"
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/dj_static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'dj_static')
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/dj_media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "dj_media")

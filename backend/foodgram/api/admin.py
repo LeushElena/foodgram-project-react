@@ -17,8 +17,8 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ("id", "author", "title", "show_count_add_to_favorite")
-    list_filter = ("author", "title", "tags",)
+    list_display = ("id", "author", "name", "show_count_add_to_favorite")
+    list_filter = ("author", "name", "tags",)
 
     def show_count_add_to_favorite(self, obj):
         return obj.favorites.count()

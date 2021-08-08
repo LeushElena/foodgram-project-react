@@ -1,4 +1,4 @@
-from drf_extra_fields.fields import Base64ImageField #для сериализации image на Postgres - добавила заранее
+from drf_extra_fields.fields import Base64ImageField
 
 from django.shortcuts import get_object_or_404
 
@@ -61,7 +61,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ("id", "tags", "author", "ingredients",
-                  "title", "text", "cooking_time", "image",  
+                  "name", "text", "cooking_time", "image",  
                   "is_favorited", "is_in_shopping_cart")
 
     def create(self, validated_data):
@@ -86,7 +86,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance.title = validated_data.get("title", instance.title)
+        instance.name = validated_data.get("name", instance.name)
         instance.text = validated_data.get("text", instance.text)
         instance.cooking_time = (
             validated_data.get("cooking_time", instance.cooking_time)
@@ -121,8 +121,8 @@ class RecipeMinifiedSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Recipe
-        fields = ("id", "title", "cooking_time", "image")
-        read_only_fields = ("id", "title", "cooking_time", "image")
+        fields = ("id", "name", "cooking_time", "image")
+        read_only_fields = ("id", "name", "cooking_time", "image")
 
 
 class CreateFavoriteSerializer(serializers.ModelSerializer):
@@ -166,7 +166,7 @@ class SubsribeSerializer(serializers.ModelSerializer):
         limit = request.GET.get("recipes_limit")
         queryset = obj.author.recipe_set.all().order_by("-id")
         if limit:
-            obj.author.recipe_set.all().order_by("-id")[:limit]
+            obj.author.recipe_set.all().order_by("-id")[:int(limit)]
         return RecipeMinifiedSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):

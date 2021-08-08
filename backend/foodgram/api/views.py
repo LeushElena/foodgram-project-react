@@ -140,5 +140,6 @@ class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    permission_classes = (OwnerOrReadOnly,)
     filter_backends = (IngredientSearchFilter,)
     search_fields = ["^name"]
