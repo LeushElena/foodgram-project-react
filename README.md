@@ -7,6 +7,10 @@
 - login: test_user@test.ru
 - password: test7777
 
+Админ:
+- login: admin@ya.ru
+- password: qaz1234567
+
 Возможности сервиса:
 
 - Регистрация пользователей.
