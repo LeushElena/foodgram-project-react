@@ -110,16 +110,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-    def validate(self, data):
-        print(data, "data 114 str")
-        ingredients = self.initial_data.pop("ingredients")
-        for ingredient_model in ingredients:
-            amount = ingredient_model.pop("amount")
-            if int(amount) < 1:
-                raise ValidationError("Количество не может быть меньше 1!")
-        print(data, "data 120 str")
-        return data
-    
     def get_is_favorited(self, obj):
         return obj.favorites.exists()
     
