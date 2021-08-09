@@ -67,16 +67,19 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = self.initial_data.pop("ingredients")
+        cooking_time = self.initial_data.pop("cooking_time")
+        if int(cooking_time) < 1:
+            raise ValidationError("Время приготовления не может быть меньше 1!")
         for ingredient_model in ingredients:
             amount = ingredient_model.get("amount")
             if int(amount) < 1:
                 raise ValidationError("Количество не может быть меньше 1!")
-        data["ingredients"] = ingredients
+        data["ingredients"], data["cooking_time"] = ingredients, cooking_time
         return data
     
     def create(self, validated_data):
         image = validated_data.pop("image")
-        ingredients = self.initial_data.pop("ingredients")
+        ingredients = validated_data.pop("ingredients")
         tags_data = self.initial_data.pop("tags")
         recipe = Recipe.objects.create(
             author=get_object_or_404(
