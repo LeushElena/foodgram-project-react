@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (Cart, CustomUser, Favorite, Ingredient, IngredientRecipe, 
@@ -70,8 +71,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = self.initial_data.pop("tags")
         recipe = Recipe.objects.create(
             author=get_object_or_404(
-                CustomUser, id=validated_data.pop("author").id), 
-            **validated_data
+                CustomUser, id=validated_data.pop("author").id),
+                image=image, **validated_data
         )
         for tag_ in tags_data:
             recipe.tags.add(get_object_or_404(Tag, id=tag_))
@@ -108,6 +109,16 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
         instance.save()
         return instance
+    
+    def validate(self, data):
+        print(data, "data 114 str")
+        ingredients = self.initial_data.pop("ingredients")
+        for ingredient_model in ingredients:
+            amount = ingredient_model.pop("amount")
+            if int(amount) < 1:
+                raise ValidationError("Количество не может быть меньше 1!")
+        print(data, "data 120 str")
+        return data
     
     def get_is_favorited(self, obj):
         return obj.favorites.exists()
