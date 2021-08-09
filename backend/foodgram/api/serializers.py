@@ -65,6 +65,15 @@ class RecipeSerializer(serializers.ModelSerializer):
                   "name", "text", "cooking_time", "image",  
                   "is_favorited", "is_in_shopping_cart")
 
+    def validate(self, data):
+        ingredients = self.initial_data.pop("ingredients")
+        for ingredient_model in ingredients:
+            amount = ingredient_model.get("amount")
+            if int(amount) < 1:
+                raise ValidationError("Количество не может быть меньше 1!")
+        data["ingredients"] = ingredients
+        return data
+    
     def create(self, validated_data):
         image = validated_data.pop("image")
         ingredients = self.initial_data.pop("ingredients")
@@ -98,7 +107,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = self.initial_data.pop("tags")
         for tag_ in tags_data:
             instance.tags.add(get_object_or_404(Tag, id=tag_))
-        ingredients = self.initial_data.pop("ingredients")
+        ingredients = validated_data.pop("ingredients")
         for ingredient_model in ingredients:
             amount = ingredient_model.pop("amount")
             current_ingredient = get_object_or_404(Ingredient,
