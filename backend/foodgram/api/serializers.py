@@ -57,7 +57,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True, read_only=True
     )
     tags = TagSerializer(read_only=True, many=True)
-    cooking_time = serializers.IntegerField(validators=(MinValueValidator(1)))
+    cooking_time = serializers.IntegerField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     
@@ -69,11 +69,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = self.initial_data.pop("ingredients")
+        cooking_time = self.initial_data.pop("cooking_time")
         for ingredient_model in ingredients:
             amount = ingredient_model.get("amount")
             if int(amount) < 1:
                 raise ValidationError("Количество не может быть меньше 1!")
-        data["ingredients"] = ingredients
+        if int(cooking_time) < 1:
+            raise ValidationError("Время приготовления не может быть меньше 1!")
+        data["ingredients"], data["cooking_time"] = ingredients, cooking_time
         return data
     
     def create(self, validated_data):
