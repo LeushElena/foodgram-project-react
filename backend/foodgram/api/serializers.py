@@ -57,8 +57,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True, read_only=True
     )
     tags = TagSerializer(read_only=True, many=True)
-    cooking_time = serializers.IntegerField()
-    is_favorited = serializers.SerializerMethodField(validators=[MinValueValidator(1)])
+    cooking_time = serializers.IntegerField(
+        validators=[MinValueValidator(1)], 
+        message=["Время приготовления не может быть меньше 1"]
+    )
+    is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     
     class Meta:
