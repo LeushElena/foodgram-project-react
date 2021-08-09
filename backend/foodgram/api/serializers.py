@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from drf_extra_fields.fields import Base64ImageField
 
 from django.shortcuts import get_object_or_404
@@ -56,6 +57,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True, read_only=True
     )
     tags = TagSerializer(read_only=True, many=True)
+    cooking_time = serializers.IntegerField(validators=(MinValueValidator(1)))
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     
@@ -67,18 +69,12 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = self.initial_data.pop("ingredients")
-        cooking_time = self.initial_data.pop("cooking_time")
         for ingredient_model in ingredients:
             amount = ingredient_model.get("amount")
             if int(amount) < 1:
                 raise ValidationError("Количество не может быть меньше 1!")
-        if int(cooking_time) < 1:
-            raise ValidationError("Время приготовления не может быть меньше 1!")
-        data["ingredients"], data["cooking_time"] = ingredients, cooking_time
+        data["ingredients"] = ingredients
         return data
-
-    def validate_cooking_time(self, data):
-        return data if data > 1 else ValidationError('Время приготовления не может быть меньше 1!')
     
     def create(self, validated_data):
         image = validated_data.pop("image")
