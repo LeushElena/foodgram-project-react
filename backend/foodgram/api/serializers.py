@@ -76,6 +76,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise ValidationError("Время приготовления не может быть меньше 1!")
         data["ingredients"], data["cooking_time"] = ingredients, cooking_time
         return data
+
+    def validate_cooking_time(self, data):
+        return data if data > 1 else ValidationError('Время приготовления не может быть меньше 1!')
     
     def create(self, validated_data):
         image = validated_data.pop("image")
