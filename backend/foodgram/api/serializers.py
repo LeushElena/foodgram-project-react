@@ -1,4 +1,5 @@
 from django.core.validators import MinValueValidator
+from django.http import request
 from drf_extra_fields.fields import Base64ImageField
 
 from django.shortcuts import get_object_or_404
@@ -22,7 +23,10 @@ class CustomUserSerializer(UserSerializer):
                   "last_name", "is_subscribed")
 
     def get_is_subscribed(self, obj):
-        return obj.subscribing.exists()
+        request = self.context.get("request")
+        if request.user.is_authenticated:
+            return Subsribe.objects.filter(
+                user=request.user, author=obj).exists()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -74,8 +78,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = self.initial_data.pop("ingredients")
         for ingredient_model in ingredients:
-            amount = ingredient_model.get("amount")
-            if int(amount) < 1:
+            if int(ingredient_model["amount"]) < 1:
                 raise ValidationError("Количество не может быть меньше 1!")
         data["ingredients"] = ingredients
         return data
@@ -126,10 +129,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
     
     def get_is_favorited(self, obj):
-        return obj.favorites.exists()
+        request = self.context.get("request")
+        if request.user.is_authenticated:
+            return Favorite.objects.filter(
+                recipe=obj, user=request.user).exists()
     
     def get_is_in_shopping_cart(self, obj):
-        return obj.in_cart.exists()
+        request = self.context.get("request")
+        if request.user.is_authenticated:
+            return Cart.objects.filter(
+                recipe=obj, user=request.user).exists()
 
 
 class RecipeMinifiedSerializer(serializers.ModelSerializer):
@@ -189,7 +198,9 @@ class SubsribeSerializer(serializers.ModelSerializer):
         return obj.author.recipe_set.count()
 
     def get_is_subscribed(self, obj):
-        return obj.author.subscribing.exists()
+        request = self.context.get("request")
+        if request.user.is_authenticated:
+            return obj.author.subscribing.exists()
 
 
 class ShowSubsribeSerializer(serializers.ModelSerializer):
