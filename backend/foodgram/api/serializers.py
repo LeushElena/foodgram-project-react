@@ -80,6 +80,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_model in ingredients:
             if int(ingredient_model["amount"]) < 1:
                 raise ValidationError("Количество не может быть меньше 1!")
+        count_unique_ingreds = set([item["id"] for item in ingredients])
+        if len(count_unique_ingreds) != len(ingredients):
+            raise ValidationError(
+                "Несколько раз добавить ингредиент в рецепт нельзя!"
+            )
         data["ingredients"] = ingredients
         return data
     
@@ -217,7 +222,7 @@ class ShowSubsribeSerializer(serializers.ModelSerializer):
         limit = self.context.get("recipes_limit")
         queryset = obj.recipe_set.all().order_by("-id")
         if limit:
-            obj.recipe_set.all().order_by("-id")[:limit]
+            obj.recipe_set.all().order_by("-id")[:int(limit)]
         return RecipeMinifiedSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):

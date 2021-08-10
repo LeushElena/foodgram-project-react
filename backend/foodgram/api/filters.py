@@ -14,29 +14,27 @@ class RecipeSearchFilter(SearchFilter):
 
 
 class TagAndAuthorFilter(FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(
-        field_name="tags__slug", to_field_name="slug",
-        queryset=Tag.objects.all()
-    )
+    tags = filters.AllValuesMultipleFilter(
+        field_name="tagrecipe__tags__slug")
     author = filters.ModelChoiceFilter(
         queryset=CustomUser.objects.all()
     )
-    is_favorited = filters.BooleanFilter(method="get_favorited")
+    is_favorited = filters.BooleanFilter(method="get_is_favorited")
     is_in_shopping_cart = filters.BooleanFilter(
         method="get_is_in_shopping_cart"
     )
    
-    def get_favorited(self, request, queryset, value):
+    def get_is_favorited(self, queryset, name, value):
         user=self.request.user
         if value:
-            return Recipe.objects.filter(favorites__user=user)
-        return Recipe.objects.all()
+            return queryset.filter(favorites__user=user)
+        return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
         if value:
-            return Recipe.objects.filter(in_cart__user=user)
-        return Recipe.objects.all()
+            return queryset.filter(in_cart__user=user)
+        return queryset
     
     class Meta:
         model = Recipe
